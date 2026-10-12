@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Barkipelago — a corgi platformer</title>
+<meta name="description" content="Barkipelago: a hand-drawn corgi platformer across floating islands. Play free in your browser.">
+<meta name="theme-color" content="#0b1830"><link rel="icon" href="corgi.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<header class="top">
+  <a href="#/" class="brand" data-link><img src="corgi.svg" alt=""><span data-name>Barkipelago</span></a>
+  <nav id="nav">
+    <a href="#/" data-link>Islands</a><a href="#/play" data-link>Play</a><a href="#/quests" data-link>Quests</a>
+    <a href="#/summon" data-link>Summon</a><a href="#/waitlist" data-link>Waitlist</a><a href="#/connect" data-link>Connect</a>
+    <span class="pill" id="navpill"></span>
+  </nav>
+  <div class="tools">
+    <button id="wallet" class="btn ghost sm" title="Read-only wallet connect">Connect wallet</button>
+    <button id="mute" class="icon" aria-label="Toggle music">♪</button>
+  </div>
+</header>
+
+<main id="views">
+<!-- HOME / MAP -->
+<section class="view" data-view="home">
+  <div class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">A cozy-chaotic platformer · free in your browser</span>
+      <h1><span data-name>Barkipelago</span></h1>
+      <p class="lead" data-tagline></p>
+      <div class="cta"><a class="btn" href="#/play" data-link id="ctaPlay">Play now <span>→</span></a><a class="btn ghost" href="#/waitlist" data-link>Join the waitlist</a></div>
+      <div class="stats" id="homeStats"></div>
+    </div>
+  </div>
+  <div class="map-wrap">
+    <svg id="map" viewBox="0 0 1200 640" role="img" aria-label="Island world map"></svg>
+    <div id="island-card" class="island-card" hidden></div>
+  </div>
+  <p class="hint">Hover an island to peek · click to dive in. New islands unlock as Corgi clears the last one.</p>
+</section>
+
+<!-- PLAY -->
+<section class="view" data-view="play">
+  <div class="game-shell">
+    <div class="hud" id="hud">
+      <span class="h-name" id="hName">—</span>
+      <span class="h-item">❤ <b id="hHearts">3</b></span>
+      <span class="h-item">🦴 <b id="hBones">0</b><i id="hTotal"></i></span>
+      <span class="h-item" id="hKey" title="Kennel key">🔑 <b>—</b></span>
+      <span class="h-item">⏱ <b id="hTime">0.0</b>s</span>
+      <span class="grow"></span>
+      <button class="icon" id="pauseBtn" aria-label="Pause">❚❚</button>
+    </div>
+    <div class="stage">
+      <canvas id="game" width="960" height="544"></canvas>
+      <div class="toast" id="toast"></div>
+      <div class="overlay" id="pickOverlay"><div class="ov-card"><h3>Pick an island</h3><div id="pickList" class="pick"></div><p class="muted small">← → / A D to run · Space / W / ↑ to jump · P to pause · R to restart</p></div></div>
+      <div class="overlay" id="pauseOverlay" hidden><div class="ov-card"><h3>Paused</h3><div class="row"><button class="btn" id="resume">Resume</button><button class="btn ghost" id="restart">Restart</button><a class="btn ghost" href="#/" data-link>World map</a></div></div></div>
+      <div class="overlay" id="doneOverlay" hidden><div class="ov-card" id="doneCard"></div></div>
+    </div>
+    <div class="touch" aria-hidden="true"><button data-touch="l">◀</button><button data-touch="r">▶</button><button data-touch="j" class="jump">⤒</button></div>
+    <aside class="questbar" id="questbar"></aside>
+  </div>
+</section>
+
+<!-- QUESTS -->
+<section class="view" data-view="quests">
+  <div class="sec-head"><span class="eyebrow">Quest log</span><h2>Every island hides three jobs.</h2><p class="lead">Progress saves on this device. Stars are forever (unless you wipe your browser).</p></div>
+  <div id="questlog" class="qgrid"></div>
+  <p class="center"><button class="btn ghost sm" id="resetSave">Reset progress</button></p>
+</section>
+
+<!-- SUMMON -->
+<section class="view" data-view="summon">
+  <div class="sec-head"><span class="eyebrow">Summon · demo</span><h2>Summon your island pup.</h2><p class="lead">Ring the bell and a one-of-<span id="supply"></span> corgi crawls out of the portal with traits from Common to Legendary. Same number, same pup.</p></div>
+  <div class="summon">
+    <div class="portal-wrap"><div class="portal" id="portal"><i></i><i></i><i></i></div>
+      <div class="card3d" id="card"><div class="face back"><img src="corgi.svg" alt=""><b>?</b></div><div class="face front"><canvas id="pup" width="320" height="320"></canvas><div class="pupmeta" id="pupmeta"></div></div></div>
+    </div>
+    <div class="summon-side">
+      <button class="btn big" id="summonBtn">🔔 Summon a pup</button>
+      <label class="sign"><input type="checkbox" id="signSummon"> Sign a free message to tag it to my wallet (optional)</label>
+      <div id="traits" class="traits"></div>
+      <div class="note">Demo only — <b>not an NFT</b>. No minting, no gas, no payments. Pups live in your browser.</div>
+      <h4>Your kennel</h4><div id="kennel" class="kennel"></div>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<section class="view" data-view="waitlist">
+  <div class="sec-head"><span class="eyebrow">Waitlist</span><h2>Be first on the boat.</h2><p class="lead">New islands, the full release and early pup summons. We'll ping you — no spam, just barks.</p></div>
+  <form id="wl" class="wl" novalidate>
+    <label>Email<input type="email" name="email" placeholder="you@doggo.com" required></label>
+    <label>X handle <small>(optional)</small><input name="x" placeholder="@yourhandle"></label>
+    <label class="sign"><input type="checkbox" id="signWl"> Verify my wallet with a free signature (optional)</label>
+    <button class="btn big" type="submit">Join the waitlist</button>
+    <p class="msg" id="wlmsg" role="status"></p>
+  </form>
+  <ul class="perks"><li><b>🏝 Early islands</b>Beta access to new worlds.</li><li><b>🐾 Founders pup</b>A guaranteed Rare+ summon in the demo.</li><li><b>🏆 Leaderboards</b>Speedrun boards when they launch.</li></ul>
+</section>
+
+<!-- CONNECT -->
+<section class="view" data-view="connect">
+  <div class="sec-head"><span class="eyebrow">Connect</span><h2>Bring your pack.</h2></div>
+  <div class="cgrid">
+    <div class="ccard"><div class="cico">𝕏</div><h3>Connect X</h3><p>Soon: share your runs, show your best time, and unlock a Corgi-voiced shout-out. Nothing is connected yet.</p><button class="btn ghost" disabled>Coming soon</button><a class="small" id="xfollow" target="_blank" rel="noopener"></a></div>
+    <div class="ccard"><div class="cico">◈</div><h3>Wallet (read-only)</h3><p id="wstatus">Not connected.</p><div class="row"><button class="btn" id="wallet2">Connect wallet</button><button class="btn ghost" id="addChain">Add / switch to Robinhood Chain</button></div>
+      <div class="note sec">🔒 <b>Read-only, never asks for approvals or transfers.</b> We only read your address and chain. The only thing you may ever be asked to sign is an optional, free plain-text message.</div></div>
+  </div>
+</section>
+</main>
+<footer class="foot"><span><span data-name>Barkipelago</span> · starring Corgi 🐾</span><span class="muted">All art & music made in code. No trackers.</span></footer>
+
+<script src="js/config.js"></script><script src="js/music.js"></script><script src="js/game.js"></script><script src="js/wallet.js"></script><script src="js/summon.js"></script><script src="js/app.js"></script>
+</body></html>
